@@ -1,11 +1,8 @@
-import mongoose,{Schema} from 'mongoose'
+import mongoose, {Schema} from 'mongoose'
+import {ITask} from "../model/models";
 
 mongoose.connect('mongodb://localhost:27017/task-manager-api')
 
-interface Task {
-    description:string,
-    isCompleted:boolean
-}
 
 const taskSchema = new Schema({
     description:{
@@ -16,7 +13,7 @@ const taskSchema = new Schema({
     }
 })
 
-const Task = mongoose.model<Task>('Task',taskSchema)
+const Task = mongoose.model<ITask>('Task',taskSchema)
 
 const task1 = new Task({
     description:"Task-1",
