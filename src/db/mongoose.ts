@@ -1,27 +1,30 @@
-import mongoose from 'mongoose'
+import mongoose,{Schema} from 'mongoose'
 
 mongoose.connect('mongodb://localhost:27017/task-manager-api')
 
-interface User{
-    name:string,
-    age:number
+interface Task {
+    description:string,
+    isCompleted:boolean
 }
 
-const userSchema = new mongoose.Schema<User>({
-    name:{
+const taskSchema = new Schema({
+    description:{
         type:String
     },
-    age:{
-        type:Number
+    isCompleted:{
+        type:Boolean
     }
 })
 
-const User = mongoose.model('User',userSchema)
+const Task = mongoose.model<Task>('Task',taskSchema)
 
-const naresh = new User({name:"Naresh",age:22})
+const task1 = new Task({
+    description:"Task-1",
+    isCompleted:false
+})
 
-naresh.save().then((res)=>{
-    console.log(res)
-}).catch((err)=>{
-    console.log("Error occurred while saving...",err)
+task1.save().then((response)=>{
+    console.log(response)
+}).catch((error)=>{
+    console.log("Error occurred while Saving the Task : ",error)
 })
