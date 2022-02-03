@@ -1,7 +1,9 @@
 import express from "express";
+import {connectToDatabase} from "./db/mongo";
 
 const app = express()
 const port = process.env.PORT || 3000
+connectToDatabase('mongodb://localhost:27017/task-manager-api')
 
 app.use(express.json())
 
