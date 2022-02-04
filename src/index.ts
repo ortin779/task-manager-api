@@ -35,7 +35,7 @@ app.get("/users", (req, res) => {
 
 app.get("/users/:id",async (req, res) => {
     const userId = req.params.id;
-    User.find({_id: userId}).then((user)=>{
+    User.findById(userId).then((user)=>{
         res.status(200).send(user)
     }).catch((error)=>{
         res.status(400);
@@ -68,7 +68,7 @@ app.get("/tasks",(req, res) => {
 
 app.get("/tasks/:taskId",(req, res) => {
     const taskId = req.params.taskId;
-    Task.find({_id:taskId}).then((task)=>{
+    Task.findById(taskId).then((task)=>{
         res.status(200).send(task)
     }).catch((error)=>{
         res.status(400).send(error)
