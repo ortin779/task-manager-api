@@ -22,6 +22,29 @@ app.post("/users",((req, res) => {
     })
 }))
 
+app.get("/users", (req, res) => {
+    User.find({}).then((users)=>{
+        res.status(200).send(users)
+    }).catch((error)=>{
+        res.status(400);
+        res.send({
+            error:error
+        })
+    })
+})
+
+app.get("/users/:id",async (req, res) => {
+    const userId = req.params.id;
+    User.find({_id: userId}).then((user)=>{
+        res.status(200).send(user)
+    }).catch((error)=>{
+        res.status(400);
+        res.send({
+            error:error
+        })
+    });
+})
+
 app.post("/tasks",(req, res) => {
     const task = new Task(req.body);
     task.save().then((response)=>{
