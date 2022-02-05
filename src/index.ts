@@ -62,6 +62,19 @@ app.put("/users/:id",async (req, res) => {
     }
 })
 
+app.delete("/users/:id", async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const deletedUser = await User.findByIdAndDelete(userId);
+        if(deletedUser){
+            return res.send({message:"Deleted user Successfully"})
+        }
+        res.status(404).send({message:"User not Found"})
+    }catch (e) {
+        res.status(400).send(e)
+    }
+})
+
 app.post("/tasks", async (req, res) => {
     const task = new Task(req.body);
     try {
@@ -111,6 +124,23 @@ app.put("/tasks/:taskId", async (req, res) => {
         }
         res.status(404).send({message: "No Task with given id"})
     } catch (e) {
+        res.status(400).send(e)
+    }
+})
+
+app.delete("/tasks/:taskId", async (req, res) => {
+    const taskId = req.params.taskId;
+    try {
+        const deletedTask = await Task.findByIdAndDelete(taskId);
+        if (deletedTask){
+            return res.status(200).send({
+                message:"Deleted the task successfully"
+            })
+        }
+        res.status(400).send({
+            message:"No task to delete, with the given ID"
+        })
+    }catch (e){
         res.status(400).send(e)
     }
 })
