@@ -41,7 +41,7 @@ app.get("/users/:id", async (req, res) => {
     }
 })
 
-app.put("/users/:id",async (req, res) => {
+app.put("/users/:id", async (req, res) => {
     const userId = req.params.id;
     const allowedUpdates = ["name", "age", "password", "email"];
     const requestedUpdates = Object.keys(req.body);
@@ -66,11 +66,14 @@ app.delete("/users/:id", async (req, res) => {
     const userId = req.params.id;
     try {
         const deletedUser = await User.findByIdAndDelete(userId);
-        if(deletedUser){
-            return res.send({message:"Deleted user Successfully"})
+        if (deletedUser) {
+            return res.send({
+                message: "Deleted user Successfully",
+                user: deletedUser
+            })
         }
-        res.status(404).send({message:"User not Found"})
-    }catch (e) {
+        res.status(404).send({message: "User not Found"})
+    } catch (e) {
         res.status(400).send(e)
     }
 })
@@ -109,16 +112,16 @@ app.get("/tasks/:taskId", async (req, res) => {
 
 app.put("/tasks/:taskId", async (req, res) => {
     const taskId = req.params.taskId;
-    const allowedUpdates = ["description","completed"];
+    const allowedUpdates = ["description", "completed"];
     const requestedUpdates = Object.keys(req.body);
-    const isValidUpdateRequest = requestedUpdates.every((updateRequest)=>allowedUpdates.includes(updateRequest));
-    if(!isValidUpdateRequest){
+    const isValidUpdateRequest = requestedUpdates.every((updateRequest) => allowedUpdates.includes(updateRequest));
+    if (!isValidUpdateRequest) {
         return res.status(400).send({
-            message:"Invalid Update Request"
+            message: "Invalid Update Request"
         })
     }
     try {
-        const task = await Task.findByIdAndUpdate(taskId,req.body,{new:true,runValidators:true});
+        const task = await Task.findByIdAndUpdate(taskId, req.body, {new: true, runValidators: true});
         if (task) {
             return res.status(200).send(task)
         }
@@ -132,15 +135,16 @@ app.delete("/tasks/:taskId", async (req, res) => {
     const taskId = req.params.taskId;
     try {
         const deletedTask = await Task.findByIdAndDelete(taskId);
-        if (deletedTask){
+        if (deletedTask) {
             return res.status(200).send({
-                message:"Deleted the task successfully"
+                message: "Deleted the task successfully",
+                task: deletedTask
             })
         }
         res.status(400).send({
-            message:"No task to delete, with the given ID"
+            message: "No task to delete, with the given ID"
         })
-    }catch (e){
+    } catch (e) {
         res.status(400).send(e)
     }
 })
