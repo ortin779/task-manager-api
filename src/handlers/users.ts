@@ -1,13 +1,11 @@
 import {Router} from "express";
 import {User} from "../model/user";
-import bcrypt from 'bcrypt'
 
 export const userRouter = Router();
 
 userRouter.post("/users", async (req, res) => {
     const user = new User(req.body)
     try {
-        user.password = await bcrypt.hash(user.password, 8);
         const savedUser = await user.save();
         res.status(201).send(savedUser);
     } catch (e) {
@@ -48,12 +46,11 @@ userRouter.put("/users/:id", async (req, res) => {
         })
     }
     try {
-        if(req.body.password){
-            req.body.password = await bcrypt.hash(req.body.password, 8);
-        }
-        const user = await User.findByIdAndUpdate(userId, req.body, {new: true, runValidators: true});
+        const user = await User.findById(userId);
         if (user) {
-            return res.send(user)
+            requestedUpdates.forEach((update) => user[update] = req.body[update])
+            const savedUser = await user.save()
+            return res.send(savedUser)
         }
         res.status(404).send('User not Found')
     } catch (e) {

@@ -46,8 +46,10 @@ taskRouter.put("/tasks/:taskId", async (req, res) => {
         })
     }
     try {
-        const task = await Task.findByIdAndUpdate(taskId, req.body, {new: true, runValidators: true});
+        const task = await Task.findById(taskId);
         if (task) {
+            requestedUpdates.forEach((update)=>task[update]=req.body[update]);
+            await task.save();
             return res.status(200).send(task)
         }
         res.status(404).send({message: "No Task with given id"})
