@@ -1,17 +1,20 @@
 import mongoose, {Model, Schema} from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export interface IUser{
     [key:string]:any,
     name:string,
     email:string,
     password:string,
-    age:number
+    age:number,
+    tokens:{token:string}[]
 }
 
 export interface IUserModel extends Model<IUser>{
     findUserByCredentials(email:string,password:string):IUser;
+    generateJwtToken():string;
 }
 
 const userSchema:Schema<IUser,IUserModel> = new Schema<IUser,IUserModel>({
@@ -48,7 +51,19 @@ const userSchema:Schema<IUser,IUserModel> = new Schema<IUser,IUserModel>({
                 throw new Error("Invalid Age value")
             }
         }
-    }
+    },
+    tokens:[{
+        token:{
+            type:String
+        }
+    }]
+})
+
+userSchema.method("generateJwtToken",async function generateJwtToken(){
+    const user = this
+    const token = jwt.sign({_id:user._id.toString()},"salt")
+    user.tokens = user.tokens.concat({token})
+    return token;
 })
 
 userSchema.static("findUserByCredentials",async function findUserByCredentials(email:string,password:string) {

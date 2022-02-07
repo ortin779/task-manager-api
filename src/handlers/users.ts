@@ -7,7 +7,8 @@ userRouter.post("/users", async (req, res) => {
     const user = new User(req.body)
     try {
         const savedUser = await user.save();
-        res.status(201).send(savedUser);
+        const token = await user.generateJwtToken();
+        res.status(201).send({user:savedUser,token:token});
     } catch (e) {
         res.status(400).send(e)
     }
