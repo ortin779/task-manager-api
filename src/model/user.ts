@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, {Model, Schema} from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 
@@ -10,7 +10,11 @@ export interface IUser{
     age:number
 }
 
-const userSchema = new Schema({
+export interface IUserModel extends Model<IUser>{
+    findUserByCredentials(email:string,password:string):IUser;
+}
+
+const userSchema:Schema<IUser,IUserModel> = new Schema<IUser,IUserModel>({
     name:{
         type:String,
         trim:true,
@@ -20,6 +24,7 @@ const userSchema = new Schema({
         type:String,
         trim:true,
         required:true,
+        unique:true,
         validate:(email:string)=>{
             return validator.isEmail(email)
         }
@@ -46,6 +51,18 @@ const userSchema = new Schema({
     }
 })
 
+userSchema.static("findUserByCredentials",async function findUserByCredentials(email:string,password:string) {
+    const user = await User.findOne({email});
+    if(!user){
+        throw new Error("Invalid Login, Please Try again")
+    }
+    const isPasswordMatched = await bcrypt.compare(password,user.password);
+    if(!isPasswordMatched){
+        throw new Error("Invalid Login, Please Try Again")
+    }
+    return user;
+})
+
 userSchema.pre('save', async function (next){
     const user = this;
     if(user.isModified("password")){
@@ -54,4 +71,4 @@ userSchema.pre('save', async function (next){
     next()
 })
 
-export const User = mongoose.model<IUser>('User',userSchema)
+export const User = mongoose.model<IUser,IUserModel>('User',userSchema)
