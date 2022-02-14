@@ -98,5 +98,17 @@ userRouter.post("/users/logout",authentication, async (req:RequestWithUser, res)
     } catch (e) {
         res.status(400).send("Login failed")
     }
-
 })
+
+userRouter.post("/users/logout-all",authentication, async (req:RequestWithUser, res) => {
+    try {
+        const token = req.header("Authorization")!.replace("Bearer","");
+        req.user!.tokens = [];
+        await req.user?.save();
+        res.status(200).send(req.user);
+    } catch (e) {
+        res.status(400).send("Login failed")
+    }
+})
+
+
