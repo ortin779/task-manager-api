@@ -1,5 +1,7 @@
 import {Router} from "express";
 import {User} from "../model/user";
+import {authentication} from "../middleware/authentication";
+import {RequestWithUser} from "../model/customRequest";
 
 export const userRouter = Router();
 
@@ -14,10 +16,11 @@ userRouter.post("/users", async (req, res) => {
     }
 })
 
-userRouter.get("/users", async (req, res) => {
+userRouter.get("/users/me",authentication, async (req:RequestWithUser, res) => {
     try {
-        const users = await User.find({});
-        res.status(200).send(users)
+        const userId = req.user?._id;
+        const user = await User.findById(userId);
+        res.status(200).send(user)
     } catch (e) {
         res.status(400).send(e)
     }
@@ -78,7 +81,21 @@ userRouter.delete("/users/:id", async (req, res) => {
 userRouter.post("/users/login", async (req, res) => {
     try {
         const user = await User.findUserByCredentials(req.body.email,req.body.password);
-        res.status(200).send(user)
+        res.status(200).send({user,token:user.tokens[user.tokens.length-1]})
+    } catch (e) {
+        res.status(400).send("Login failed")
+    }
+
+})
+
+userRouter.post("/users/logout",authentication, async (req:RequestWithUser, res) => {
+    try {
+        const token = req.header("Authorization")!.replace("Bearer","");
+        const user = req.user;
+        const index = user?.tokens.indexOf({token});
+        user?.tokens.splice(index!,1);
+        await user!.save();
+        res.status(200).send({user});
     } catch (e) {
         res.status(400).send("Login failed")
     }

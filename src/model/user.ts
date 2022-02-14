@@ -3,7 +3,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export interface IUser{
+export interface IUser extends Document{
     [key:string]:any,
     name:string,
     email:string,
@@ -63,6 +63,7 @@ userSchema.method("generateJwtToken",async function generateJwtToken(){
     const user = this
     const token = jwt.sign({_id:user._id.toString()},"salt")
     user.tokens = user.tokens.concat({token})
+    await user.save()
     return token;
 })
 
@@ -75,6 +76,7 @@ userSchema.static("findUserByCredentials",async function findUserByCredentials(e
     if(!isPasswordMatched){
         throw new Error("Invalid Login, Please Try Again")
     }
+    await user.generateJwtToken();
     return user;
 })
 

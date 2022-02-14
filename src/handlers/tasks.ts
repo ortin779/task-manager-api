@@ -1,9 +1,10 @@
 import {Router} from "express";
 import {Task} from "../model/task";
+import {authentication} from "../middleware/authentication";
 
 export const taskRouter = Router();
 
-taskRouter.post("/tasks", async (req, res) => {
+taskRouter.post("/tasks",authentication, async (req, res) => {
     const task = new Task(req.body);
     try {
         const createdTask = await task.save();
@@ -13,7 +14,7 @@ taskRouter.post("/tasks", async (req, res) => {
     }
 })
 
-taskRouter.get("/tasks", async (req, res) => {
+taskRouter.get("/tasks",authentication, async (req, res) => {
     try {
         const tasks = await Task.find({});
         res.status(200).send(tasks)
@@ -22,7 +23,7 @@ taskRouter.get("/tasks", async (req, res) => {
     }
 })
 
-taskRouter.get("/tasks/:taskId", async (req, res) => {
+taskRouter.get("/tasks/:taskId",authentication, async (req, res) => {
     const taskId = req.params.taskId;
     try {
         const task = await Task.findById(taskId);
@@ -35,7 +36,7 @@ taskRouter.get("/tasks/:taskId", async (req, res) => {
     }
 })
 
-taskRouter.put("/tasks/:taskId", async (req, res) => {
+taskRouter.put("/tasks/:taskId",authentication, async (req, res) => {
     const taskId = req.params.taskId;
     const allowedUpdates = ["description", "completed"];
     const requestedUpdates = Object.keys(req.body);
@@ -58,7 +59,7 @@ taskRouter.put("/tasks/:taskId", async (req, res) => {
     }
 })
 
-taskRouter.delete("/tasks/:taskId", async (req, res) => {
+taskRouter.delete("/tasks/:taskId",authentication, async (req, res) => {
     const taskId = req.params.taskId;
     try {
         const deletedTask = await Task.findByIdAndDelete(taskId);
