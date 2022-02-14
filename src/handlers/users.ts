@@ -18,8 +18,7 @@ userRouter.post("/users", async (req, res) => {
 
 userRouter.get("/users/me",authentication, async (req:RequestWithUser, res) => {
     try {
-        const userId = req.user?._id;
-        const user = await User.findById(userId);
+        const user = req.user;
         res.status(200).send(user)
     } catch (e) {
         res.status(400).send(e)
