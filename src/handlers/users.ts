@@ -25,21 +25,7 @@ userRouter.get("/users/me",authentication, async (req:RequestWithUser, res) => {
     }
 })
 
-userRouter.get("/users/:id", async (req, res) => {
-    const userId = req.params.id;
-    try {
-        const user = await User.findById(userId);
-        if (user) {
-            return res.status(200).send(user)
-        }
-        res.status(404).send({message: "No User with given id"})
-    } catch (e) {
-        res.status(400).send(e)
-    }
-})
-
-userRouter.put("/users/:id", async (req, res) => {
-    const userId = req.params.id;
+userRouter.put("/users/me",authentication, async (req:RequestWithUser, res) => {
     const allowedUpdates = ["name", "age", "password", "email"];
     const requestedUpdates = Object.keys(req.body);
     const isValidUpdate = requestedUpdates.every((update) => allowedUpdates.includes(update));
@@ -49,7 +35,7 @@ userRouter.put("/users/:id", async (req, res) => {
         })
     }
     try {
-        const user = await User.findById(userId);
+        const user = req.user;
         if (user) {
             requestedUpdates.forEach((update) => user[update] = req.body[update])
             const savedUser = await user.save()
@@ -61,10 +47,10 @@ userRouter.put("/users/:id", async (req, res) => {
     }
 })
 
-userRouter.delete("/users/:id", async (req, res) => {
-    const userId = req.params.id;
+userRouter.delete("/users/me",authentication, async (req:RequestWithUser, res) => {
     try {
-        const deletedUser = await User.findByIdAndDelete(userId);
+        const deletedUser = req.user;
+        await req.user?.remove();
         if (deletedUser) {
             return res.send({
                 message: "Deleted user Successfully",
@@ -102,7 +88,6 @@ userRouter.post("/users/logout",authentication, async (req:RequestWithUser, res)
 
 userRouter.post("/users/logout-all",authentication, async (req:RequestWithUser, res) => {
     try {
-        const token = req.header("Authorization")!.replace("Bearer","");
         req.user!.tokens = [];
         await req.user?.save();
         res.status(200).send(req.user);

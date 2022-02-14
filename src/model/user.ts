@@ -12,9 +12,15 @@ export interface IUser extends Document{
     tokens:{token:string}[]
 }
 
+interface ExcludedUserProps {
+    password:string;
+    tokens:string[]
+}
+
 export interface IUserModel extends Model<IUser>{
     findUserByCredentials(email:string,password:string):IUser;
     generateJwtToken():string;
+    getPublicProfile():Exclude<IUser, ExcludedUserProps>
 }
 
 const userSchema:Schema<IUser,IUserModel> = new Schema<IUser,IUserModel>({
@@ -65,6 +71,14 @@ userSchema.method("generateJwtToken",async function generateJwtToken(){
     user.tokens = user.tokens.concat({token})
     await user.save()
     return token;
+})
+
+userSchema.method("toJSON",function (){
+    const user = this
+    const userObject = user.toObject();
+    delete userObject.password
+    delete userObject.tokens
+    return userObject;
 })
 
 userSchema.static("findUserByCredentials",async function findUserByCredentials(email:string,password:string) {
