@@ -3,7 +3,8 @@ import mongoose, {Schema} from "mongoose";
 export interface ITask {
     [key: string]: any,
     description: string,
-    completed: boolean
+    completed: boolean,
+    author:mongoose.Schema.Types.ObjectId
 }
 
 const taskSchema = new Schema<ITask>({
@@ -15,6 +16,10 @@ const taskSchema = new Schema<ITask>({
     completed: {
         type: Boolean,
         default: false
+    },
+    author:{
+        type:mongoose.Schema.Types.ObjectId,
+        required:true
     }
 })
 

@@ -1,7 +1,6 @@
 import {Router} from "express";
 import {User} from "../model/user";
 import {authentication} from "../middleware/authentication";
-import {RequestWithUser} from "../model/customRequest";
 
 export const userRouter = Router();
 
@@ -10,13 +9,13 @@ userRouter.post("/users", async (req, res) => {
     try {
         const savedUser = await user.save();
         const token = await user.generateJwtToken();
-        res.status(201).send({user:savedUser,token:token});
+        res.status(201).send({user: savedUser, token: token});
     } catch (e) {
         res.status(400).send(e)
     }
 })
 
-userRouter.get("/users/me",authentication, async (req:RequestWithUser, res) => {
+userRouter.get("/users/me", authentication, async (req, res) => {
     try {
         const user = req.user;
         res.status(200).send(user)
@@ -25,7 +24,7 @@ userRouter.get("/users/me",authentication, async (req:RequestWithUser, res) => {
     }
 })
 
-userRouter.put("/users/me",authentication, async (req:RequestWithUser, res) => {
+userRouter.put("/users/me", authentication, async (req, res) => {
     const allowedUpdates = ["name", "age", "password", "email"];
     const requestedUpdates = Object.keys(req.body);
     const isValidUpdate = requestedUpdates.every((update) => allowedUpdates.includes(update));
@@ -47,7 +46,7 @@ userRouter.put("/users/me",authentication, async (req:RequestWithUser, res) => {
     }
 })
 
-userRouter.delete("/users/me",authentication, async (req:RequestWithUser, res) => {
+userRouter.delete("/users/me", authentication, async (req, res) => {
     try {
         const deletedUser = req.user;
         await req.user?.remove();
@@ -65,20 +64,20 @@ userRouter.delete("/users/me",authentication, async (req:RequestWithUser, res) =
 
 userRouter.post("/users/login", async (req, res) => {
     try {
-        const user = await User.findUserByCredentials(req.body.email,req.body.password);
-        res.status(200).send({user,token:user.tokens[user.tokens.length-1]})
+        const user = await User.findUserByCredentials(req.body.email, req.body.password);
+        res.status(200).send({user, token: user.tokens[user.tokens.length - 1]})
     } catch (e) {
         res.status(400).send("Login failed")
     }
 
 })
 
-userRouter.post("/users/logout",authentication, async (req:RequestWithUser, res) => {
+userRouter.post("/users/logout", authentication, async (req, res) => {
     try {
-        const token = req.header("Authorization")!.replace("Bearer","");
+        const token = req.header("Authorization")!.replace("Bearer", "");
         const user = req.user;
         const index = user?.tokens.indexOf({token});
-        user?.tokens.splice(index!,1);
+        user?.tokens.splice(index!, 1);
         await user!.save();
         res.status(200).send({user});
     } catch (e) {
@@ -86,7 +85,7 @@ userRouter.post("/users/logout",authentication, async (req:RequestWithUser, res)
     }
 })
 
-userRouter.post("/users/logout-all",authentication, async (req:RequestWithUser, res) => {
+userRouter.post("/users/logout-all", authentication, async (req, res) => {
     try {
         req.user!.tokens = [];
         await req.user?.save();

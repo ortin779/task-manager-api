@@ -1,9 +1,8 @@
-import {NextFunction, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import jwt from "jsonwebtoken";
 import {User} from "../model/user";
-import {RequestWithUser} from "../model/customRequest";
 
-export const authentication = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const authentication = async (req:Request, res: Response, next: NextFunction) => {
     try {
         const bearer_token = req.header("Authorization");
         const jwt_token = bearer_token?.substr(7);
