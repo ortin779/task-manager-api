@@ -49,7 +49,7 @@ userRouter.put("/users/me", authentication, async (req, res) => {
 userRouter.delete("/users/me", authentication, async (req, res) => {
     try {
         const deletedUser = req.user;
-        await req.user?.remove();
+        await req.user.remove();
         if (deletedUser) {
             return res.send({
                 message: "Deleted user Successfully",
