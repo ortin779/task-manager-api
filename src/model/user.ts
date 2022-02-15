@@ -65,6 +65,12 @@ const userSchema:Schema<IUser,IUserModel> = new Schema<IUser,IUserModel>({
     }]
 })
 
+userSchema.virtual('tasks',{
+    ref:"Task",
+    localField:"_id",
+    foreignField:"author",
+})
+
 userSchema.method("generateJwtToken",async function generateJwtToken(){
     const user = this
     const token = jwt.sign({_id:user._id.toString()},"salt")

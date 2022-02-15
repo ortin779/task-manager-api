@@ -1,4 +1,5 @@
 import mongoose, {Schema} from "mongoose";
+import {User} from "./user";
 
 export interface ITask {
     [key: string]: any,
@@ -19,7 +20,8 @@ const taskSchema = new Schema<ITask>({
     },
     author:{
         type:mongoose.Schema.Types.ObjectId,
-        required:true
+        required:true,
+        ref: User
     }
 })
 
