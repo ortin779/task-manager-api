@@ -2,6 +2,7 @@ import mongoose, {Model, Schema} from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import {Task} from "./task";
 
 export interface IUser extends Document{
     [key:string]:any,
@@ -105,6 +106,12 @@ userSchema.pre('save', async function (next){
     if(user.isModified("password")){
         user.password = await bcrypt.hash(user.password, 8);
     }
+    next()
+})
+
+userSchema.pre('remove',async function (next){
+    const user = this;
+    await Task.deleteMany({author:user._id})
     next()
 })
 
