@@ -5,7 +5,7 @@ import {authentication} from "../middleware/authentication";
 export const taskRouter = Router();
 
 taskRouter.post("/tasks", authentication, async (req, res) => {
-    const task = new Task({...req.body, author: req.user!._id});
+    const task = new Task({...req.body, author: req.user._id});
     try {
         const createdTask = await task.save();
         res.status(201).send(createdTask)
@@ -16,7 +16,7 @@ taskRouter.post("/tasks", authentication, async (req, res) => {
 
 taskRouter.get("/tasks", authentication, async (req, res) => {
     try {
-        const tasks = await Task.find({author: req.user!._id});
+        const tasks = await Task.find({author: req.user._id});
         res.status(200).send(tasks)
     } catch (e) {
         res.status(400).send(e)
@@ -69,7 +69,7 @@ taskRouter.delete("/tasks/:taskId", authentication, async (req, res) => {
                 task: deletedTask
             })
         }
-        res.status(400).send({
+        res.status(404).send({
             message: "No task to delete, with the given ID"
         })
     } catch (e) {
