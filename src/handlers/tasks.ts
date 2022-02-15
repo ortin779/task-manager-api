@@ -62,7 +62,7 @@ taskRouter.put("/tasks/:taskId", authentication, async (req, res) => {
 taskRouter.delete("/tasks/:taskId", authentication, async (req, res) => {
     const taskId = req.params.taskId;
     try {
-        const deletedTask = await Task.findByIdAndDelete(taskId);
+        const deletedTask = await Task.findOneAndDelete({_id: taskId, author: req.user._id});
         if (deletedTask) {
             return res.status(200).send({
                 message: "Deleted the task successfully",
