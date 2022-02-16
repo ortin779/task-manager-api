@@ -15,9 +15,22 @@ taskRouter.post("/tasks", authentication, async (req, res) => {
 });
 
 taskRouter.get("/tasks", authentication, async (req, res) => {
+  const match:{completed?:boolean} = {};
+  if(req.query.completed){
+    match.completed = req.query.completed === "true";
+  }
+  const pageNo = Number(req.query.pageNo)-1 ?? 0;
+  const pageSize = Number(req.query.pageSize) ?? 10; 
   try {
-    const tasks = await Task.find({author: req.user._id});
-    res.status(200).send(tasks);
+    const user = await req.user.populate({
+      path:"tasks",
+      match,
+      options:{
+        limit:pageSize,
+        skip:pageSize * pageNo
+      }
+    });
+    res.status(200).send(user.tasks);
   } catch (e) {
     res.status(400).send(e);
   }
@@ -26,7 +39,7 @@ taskRouter.get("/tasks", authentication, async (req, res) => {
 taskRouter.get("/tasks/:taskId", authentication, async (req, res) => {
   const taskId = req.params.taskId;
   try {
-    const task = await Task.findOne({_id: taskId, author: req.user!._id});
+    const task = await Task.findOne({_id: taskId, author: req.user._id});
     if (task) {
       return res.status(200).send(task);
     }
@@ -47,7 +60,7 @@ taskRouter.put("/tasks/:taskId", authentication, async (req, res) => {
     });
   }
   try {
-    const task = await Task.findOne({_id: taskId, author: req.user!._id});
+    const task = await Task.findOne({_id: taskId, author: req.user._id});
     if (task) {
       requestedUpdates.forEach((update) => task[update] = req.body[update]);
       await task.save();
