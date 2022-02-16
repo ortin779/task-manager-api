@@ -3,7 +3,7 @@ import {taskRouter} from "./tasks";
 import {authRouter} from "./auth";
 
 export default [
-    userRouter,
-    taskRouter,
-    authRouter
-]
+  userRouter,
+  taskRouter,
+  authRouter
+];

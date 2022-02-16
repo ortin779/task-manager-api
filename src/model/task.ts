@@ -1,5 +1,4 @@
 import mongoose, {Schema} from "mongoose";
-import {User} from "./user";
 
 export interface ITask {
     [key: string]: any,
@@ -10,22 +9,22 @@ export interface ITask {
 }
 
 const taskSchema = new Schema<ITask>({
-    description: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    completed: {
-        type: Boolean,
-        default: false
-    },
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User'
-    }
+  description: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  completed: {
+    type: Boolean,
+    default: false
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User"
+  }
 }, {
-    timestamps: true
-})
+  timestamps: true
+});
 
-export const Task = mongoose.model("Task", taskSchema)
+export const Task = mongoose.model("Task", taskSchema);
