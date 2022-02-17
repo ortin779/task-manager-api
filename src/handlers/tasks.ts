@@ -16,8 +16,13 @@ taskRouter.post("/tasks", authentication, async (req, res) => {
 
 taskRouter.get("/tasks", authentication, async (req, res) => {
   const match:{completed?:boolean} = {};
+  const sort:Record<string,number>={};
   if(req.query.completed){
     match.completed = req.query.completed === "true";
+  }
+  if(req.query.sort){
+    const parts = (req.query.sort as string).split(":");
+    sort[parts[0]] = parts[1]==="desc" ? -1 : 1;
   }
   const pageNo = Number(req.query.pageNo)-1 ?? 0;
   const pageSize = Number(req.query.pageSize) ?? 10; 
@@ -27,7 +32,8 @@ taskRouter.get("/tasks", authentication, async (req, res) => {
       match,
       options:{
         limit:pageSize,
-        skip:pageSize * pageNo
+        skip:pageSize * pageNo,
+        sort:sort
       }
     });
     res.status(200).send(user.tasks);
